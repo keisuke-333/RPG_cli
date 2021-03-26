@@ -16,8 +16,9 @@ $enemies[] = new Enemy('ボム', 25);
 $enemies[] = new Enemy('モルボル', 30);
 
 $turn = 1;
+$isFinishFlg = false;
 
-while ($tiida->getHitPoint() > 0 && $goblin->getHitPoint() > 0) {
+while (!$isFinishFlg) {
   echo "*** $turn ターン目 ***\n\n";
 
   foreach ($members as $member) {
@@ -46,13 +47,45 @@ while ($tiida->getHitPoint() > 0 && $goblin->getHitPoint() > 0) {
     $memberIndex = rand(0, count($members) - 1); // 添字は0から始まるので、-1する
     $member = $members[$memberIndex];
     $enemy->doAttack($member);
-    echo "\n";
   }
   echo "\n";
+
+  $deathCnt = 0; // HPが0以下の仲間の数
+  foreach ($members as $member) {
+    if ($member->getHitPoint() > 0) {
+        $isFinishFlg = false;
+        break;
+    }
+    $deathCnt++;
+  }
+  if ($deathCnt === count($members)) {
+    $isFinishFlg = true;
+    echo "GAME OVER ....\n\n";
+    break;
+  }
+
+  $deathCnt = 0; // HPが0以下の敵の数
+  foreach ($enemies as $enemy) {
+    if ($enemy->getHitPoint() > 0) {
+        $isFinishFlg = false;
+        break;
+    }
+    $deathCnt++;
+  }
+  if ($deathCnt === count($enemies)) {
+    $isFinishFlg = true;
+    echo "♪♪♪ファンファーレ♪♪♪\n\n";
+    break;
+  }
 
   $turn ++;
 }
 
 echo "★★★ 戦闘終了 ★★★\n\n";
-echo $tiida->getName() . " : " . $tiida->getHitPoint() . "/" . $tiida::MAX_HITPOINT . "\n";
-echo $goblin->getName() . " : " . $goblin->getHitPoint() . "/" . $goblin::MAX_HITPOINT . "\n\n";
+foreach ($members as $member) {
+  echo $member->getName() . "　：　" . $member->getHitPoint() . "/" . $member::MAX_HITPOINT . "\n";
+}
+echo "\n";
+foreach ($enemies as $enemy) {
+  echo $enemy->getName() . "　：　" . $enemy->getHitPoint() . "/" . $enemy::MAX_HITPOINT . "\n";
+}
